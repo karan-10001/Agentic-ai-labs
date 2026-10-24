@@ -1,13 +1,16 @@
+from pathlib import Path
+
 from pypdf import PdfReader
 
-reader= PdfReader("twin/linkedin.pdf")
-linkedin=""
+TWIN_DIR = Path(__file__).resolve().parent
+reader = PdfReader(TWIN_DIR / "linkedin.pdf")
+linkedin = ""
 for page in reader.pages:
-    text= page.extract_text() + "\n"
+    text = page.extract_text()
     if text:
-        linkedin+=text
+        linkedin += text + "\n"
 
-with open("twin/summary.txt", "r", encoding="utf-8") as f:
+with (TWIN_DIR / "summary.txt").open("r", encoding="utf-8") as f:
     summary = f.read()
 
 
@@ -44,4 +47,3 @@ If you don't know the answer, use your tool to record the question, and then tel
 
 Use styling (in markdown, no code blocks) to make the response more engaging and easy to read.
 """.strip()
-

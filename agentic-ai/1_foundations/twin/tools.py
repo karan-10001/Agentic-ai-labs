@@ -1,35 +1,25 @@
 import json
 import os
+from pathlib import Path
+
 import requests
 from dotenv import load_dotenv
 
-load_dotenv(override=True)
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+load_dotenv(dotenv_path=PROJECT_ROOT / ".env", override=False)
 
-pushover_user= os.getenv("PUSHOVER_USER")
-pushover_token= os.getenv("PUSHOVER_TOKEN")
-pushover_url= "https://api.pushover.net/1/messages.json"
-
-# if pushover_user:
-#     if pushover_user.startswith("u"):
-#         print("Pushover User Key is set correctly.")
-#     else:
-#         print("Pushover user key is found but not correct")
-# else:
-#     print("Pushover key is not found")
-
-
-# if pushover_token:
-#     if pushover_token.startswith("a"):
-#         print("Pushover Token is set correctly.")
-#     else:
-#         print("Pushover token is found but not correct")
-# else:
-#     print("Pushover token is not found")    
+pushover_user = os.getenv("PUSHOVER_USER")
+pushover_token = os.getenv("PUSHOVER_TOKEN")
+pushover_url = "https://api.pushover.net/1/messages.json"
 
 
 def push(message):
-    payload = { "user": pushover_user, "token": pushover_token, "message": message }
-    requests.post(pushover_url, data=payload)
+    if not pushover_user or not pushover_token:
+        raise RuntimeError("Set PUSHOVER_USER and PUSHOVER_TOKEN to enable notifications.")
+
+    payload = {"user": pushover_user, "token": pushover_token, "message": message}
+    response = requests.post(pushover_url, data=payload, timeout=10)
+    response.raise_for_status()
 
 
 def record_user_details(email, name="not provided", phone="not provided", note="not provided"):
@@ -108,8 +98,9 @@ def handle_tool_calls_manual_if(tool_calls):
         argument= json.loads(tool_call.function.arguments)
         print(f"Tool called: {tool_name}", flush=True)
         tool = tool_map.get(tool_name)
-        result = tool(**argument) if tool else "Unknown tool: " + tool_name
+        if tool is None:
+            raise ValueError(f"Unknown tool requested by the model: {tool_name}")
+        result = tool(**argument)
         results.append({"role":"tool", "content": json.dumps(result),"tool_call_id":tool_call.id})
 
     return results
-
