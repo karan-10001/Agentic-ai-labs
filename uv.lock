@@ -16,7 +16,7 @@ resolution-markers = [
 [[package]]
 name = "agentic-ai-labs"
 version = "0.1.0"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "google-genai" },
     { name = "gradio" },
