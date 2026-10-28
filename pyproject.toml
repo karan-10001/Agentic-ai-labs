@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "google-genai>=2.22.0",
     "gradio>=6.28.0",
+    "graphviz>=0.21",
     "ipykernel>=7.3.0",
     "jupyter>=1.1.1",
     "openai>=3.8.0",
